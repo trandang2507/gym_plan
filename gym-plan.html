@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Plan tập gym 5 buổi/tuần</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  --bg: #E8ECEF; --surface: #F7F8F9; --ink: #17222B; --muted: #55646F; --line: #C6CFD6;
+  --day: #C8352B; --day-ink: #fff;
+  --head: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+  --body: "Barlow", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #12181D; --surface: #1B232A; --ink: #E6EBEE; --muted: #9AA8B2; --line: #2F3B44; }
+}
+:root[data-theme="dark"] { --bg: #12181D; --surface: #1B232A; --ink: #E6EBEE; --muted: #9AA8B2; --line: #2F3B44; }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+*, *::before, *::after { box-sizing: inherit; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--day); outline-offset: 2px; }
+[hidden] { display: none !important; }
+
+.wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 56px; }
+h1 { font-family: var(--head); font-weight: 700; font-size: clamp(34px, 8vw, 52px); line-height: 1; margin: 8px 0 6px; }
+.sub { margin: 0 0 20px; color: var(--muted); max-width: 60ch; }
+
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 22px; }
+.dbtn { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 2px 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; min-width: 0; }
+.dbtn .plate { width: 30px; height: 30px; border-radius: 50%; background: var(--c); display: grid; place-items: center; }
+.dbtn .plate::after { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--surface); }
+.dbtn .dn { font-family: var(--head); font-weight: 700; font-size: 18px; line-height: 1; }
+.dbtn .dl { font-size: 12px; color: var(--muted); line-height: 1.1; text-align: center; }
+.dbtn[aria-selected="true"] { border: 2px solid var(--c); box-shadow: 0 3px 0 var(--c); }
+.dbtn.rest { opacity: .55; cursor: default; }
+.dbtn.rest .plate { background: transparent; border: 2px dashed var(--line); }
+.dbtn.rest .plate::after { display: none; }
+
+.daytitle { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; border-left: 8px solid var(--day); padding-left: 12px; margin-bottom: 8px; }
+.daytitle h2 { font-family: var(--head); font-size: 30px; margin: 0; line-height: 1.05; }
+.daytitle span { color: var(--muted); }
+.progress { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+
+ol.list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ex { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.ex .no { font-family: var(--head); font-weight: 700; font-size: 26px; color: var(--day); line-height: 1; }
+.ex .nm { font-weight: 600; font-size: 17px; line-height: 1.2; }
+.ex .mu { display: block; color: var(--muted); font-size: 14px; font-weight: 400; margin-top: 2px; }
+.ex .rt { text-align: right; line-height: 1.15; }
+.ex .sr { font-family: var(--head); font-weight: 700; font-size: 20px; white-space: nowrap; display: block; }
+.ex .st { font-size: 13px; color: var(--muted); }
+.ex.done { border-color: var(--day); }
+.ex.done .st { color: var(--day); font-weight: 600; }
+.ex.done .no { opacity: .5; }
+@media (hover: hover) { .ex:hover { border-color: var(--day); } }
+.static { display: block; padding: 12px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+.note { margin-top: 20px; color: var(--muted); font-size: 14px; max-width: 70ch; }
+
+/* exercise page */
+.back { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px 8px 8px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-weight: 600; }
+.pos { margin-left: 10px; color: var(--muted); font-size: 14px; }
+.page h1 { margin-top: 18px; }
+.meta { color: var(--muted); margin: 0 0 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip { border: 1px solid var(--day); border-radius: 999px; padding: 2px 12px; font-weight: 600; font-size: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+.card h2 { font-family: var(--head); font-size: 24px; margin: 0 0 10px; line-height: 1.1; }
+.count { text-align: center; }
+.count .big { font-family: var(--head); font-weight: 700; font-size: 64px; line-height: 1; }
+.count .big small { font-size: 28px; color: var(--muted); font-weight: 600; }
+.count .lbl { color: var(--muted); margin: 2px 0 14px; }
+.dots { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+.dot { width: 34px; height: 34px; border-radius: 50%; border: 3px solid var(--line); display: grid; place-items: center; font-family: var(--head); font-weight: 700; font-size: 18px; color: var(--muted); }
+.dot.on { background: var(--day); border-color: var(--day); color: var(--day-ink); }
+.bigbtn { width: 100%; padding: 16px; border-radius: 12px; border: 0; background: var(--day); color: var(--day-ink); font-family: var(--head); font-weight: 700; font-size: 26px; letter-spacing: .01em; }
+.bigbtn:active { transform: translateY(1px); }
+.row2 { display: flex; gap: 10px; margin-top: 10px; }
+.ghost { flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--line); background: transparent; font-weight: 600; }
+.ghost:disabled { opacity: .4; cursor: default; }
+.finish { border: 2px solid var(--day); background: color-mix(in srgb, var(--day) 10%, transparent); }
+.finish strong { font-family: var(--head); font-size: 28px; display: block; line-height: 1.1; margin-bottom: 8px; }
+.finish .bigbtn { margin-top: 6px; }
+
+.vbtn { display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; padding: 14px 16px; border-radius: 12px; font-weight: 600; background: var(--day); color: var(--day-ink); }
+.vbtn svg { width: 20px; height: 20px; flex: none; }
+.vhint { color: var(--muted); font-size: 14px; margin: 10px 0 0; }
+.player { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: #000; }
+.player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.vhint a { color: var(--muted); }
+.vform { display: flex; gap: 8px; margin-top: 12px; }
+.vform input { flex: 1; min-width: 0; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); }
+.vform button { padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); background: transparent; font-weight: 600; }
+.linkbtn { background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; font-size: 14px; margin-top: 8px; }
+
+ol.steps { margin: 0; padding-left: 22px; }
+ol.steps li { margin-bottom: 10px; padding-left: 4px; max-width: 62ch; }
+ol.steps li::marker { color: var(--day); font-weight: 700; }
+ul.tips { margin: 0; padding: 0; list-style: none; }
+ul.tips li { margin-bottom: 8px; padding: 8px 12px; border-left: 4px solid var(--day); background: color-mix(in srgb, var(--day) 8%, transparent); border-radius: 0 8px 8px 0; max-width: 62ch; }
+.pn { display: flex; gap: 10px; }
+.pn button { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-weight: 600; }
+.pn button:disabled { opacity: .4; cursor: default; }
+@media (max-width: 480px) { .dbtn .dl { font-size: 11px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section id="home">
+    <h1>Plan tập gym 5 buổi mỗi tuần</h1>
+    <p class="sub">Nghỉ thứ 3 và thứ 5, mỗi buổi 8 bài. Bấm vào một động tác để mở trang riêng với video, hướng dẫn và bộ đếm set.</p>
+    <nav class="week" id="week" role="tablist" aria-label="Các ngày trong tuần"></nav>
+    <div class="daytitle"><h2 id="dtitle"></h2><span id="dsub"></span></div>
+    <p class="progress" id="progress"></p>
+    <ol class="list" id="list"></ol>
+    <p class="note">Mức tạ: chọn sao cho 1-2 rep cuối mỗi set khó nhưng vẫn đúng form. Khởi động 5-10 phút trước mỗi buổi. Nếu đau nhói (khác với mỏi cơ), dừng bài đó lại.</p>
+  </section>
+  <section id="page" class="page" hidden></section>
+</div>
+<script>
+var EX = {
+  bench: { n: "Bench press", m: "Ngực giữa · Vai trước · Tay sau",
+    s: ["Nằm ghế phẳng, mắt thẳng dưới thanh đòn. Ép bả vai về sau và xuống dưới, hai chân đạp chắc xuống sàn.",
+        "Nắm thanh rộng hơn vai một chút, gỡ tạ khỏi giá và giữ tay thẳng trên ngực.",
+        "Hạ tạ chậm (khoảng 2 giây) xuống giữa ngực, khuỷu tay chếch khoảng 45-60° so với thân.",
+        "Đẩy tạ lên theo đường hơi chéo về phía mắt, thở ra khi đẩy."],
+    t: ["Mông luôn chạm ghế, không nảy tạ trên ngực.", "Cổ tay giữ thẳng, thanh đòn nằm trên gốc bàn tay.", "Tập nặng nên có người đỡ hoặc đặt safety trong rack."] },
+  incdb: { n: "Incline dumbbell press", m: "Ngực trên · Vai trước",
+    s: ["Chỉnh ghế 30-45°, ngồi sát lưng vào ghế, đưa hai tạ lên ngang ngực.",
+        "Đẩy hai tạ lên trên ngực, lòng bàn tay hướng về phía trước.",
+        "Hạ tạ chậm đến khi khuỷu hơi thấp hơn vai, ngực căng.",
+        "Đẩy lên và đưa hai tạ gần chạm nhau ở đỉnh, siết ngực."],
+    t: ["Ghế trên 45° sẽ chuyển tải sang vai, giữ 30-45°.", "Giữ bả vai ép về sau suốt set.", "Chọn tạ vừa phải để hai bên đều nhau."] },
+  cfly: { n: "Chest fly (cable hoặc pec deck)", m: "Ngực (giữa và trong)",
+    s: ["Ngồi pec deck hoặc đứng giữa hai cáp, ngực ưỡn, bả vai ép về sau.",
+        "Khuỷu hơi gập, giữ góc cố định suốt chuyển động.",
+        "Kéo hai tay vào trước ngực như đang ôm một thân cây lớn.",
+        "Siết ngực 1 giây rồi mở ra chậm đến khi ngực căng."],
+    t: ["Đây là bài cô lập, dùng tạ nhẹ và tập trung cảm nhận cơ ngực.", "Không để vai nhô về trước khi kéo vào.", "Mở tay quá sâu dễ gây đau vai trước."] },
+  shp: { n: "Shoulder press (tạ đơn)", m: "Vai trước và giữa · Tay sau",
+    s: ["Ngồi ghế dựa lưng, hai tạ ở ngang tai, khuỷu hơi lệch về phía trước.",
+        "Siết bụng, đẩy tạ lên trên đầu đến khi tay gần thẳng.",
+        "Hạ chậm về ngang tai."],
+    t: ["Không ưỡn lưng dưới quá mức, siết bụng để giữ thân.", "Không khóa cứng khuỷu ở đỉnh.", "Cổ tay luôn nằm thẳng trên khuỷu."] },
+  lat: { n: "Lateral raise", m: "Vai giữa",
+    s: ["Đứng thẳng, tạ ở hai bên đùi, người ngả về trước khoảng 10°, khuỷu hơi gập.",
+        "Nâng hai tay sang hai bên đến ngang vai, khuỷu dẫn trước cổ tay.",
+        "Dừng 1 giây ở trên rồi hạ chậm trong 2-3 giây."],
+    t: ["Dùng tạ nhẹ, không vung người lấy đà.", "Không nhún vai, giữ vai thả lỏng.", "Không nâng cao hơn ngang vai."] },
+  rdf: { n: "Rear delt fly", m: "Vai sau · Giữa bả vai",
+    s: ["Ngồi cúi người về trước, ngực gần chạm đùi (hoặc dùng máy pec deck ngược), hai tạ buông dưới gối.",
+        "Khuỷu hơi gập, nâng tạ sang hai bên đến ngang vai.",
+        "Siết bả vai 1 giây rồi hạ chậm."],
+    t: ["Giữ lưng thẳng, không giật người lấy đà.", "Dùng tạ nhẹ, mục tiêu là vai sau chứ không phải lưng trên.", "Cổ tay giữ cùng đường với cẳng tay."] },
+  tpd: { n: "Tricep pushdown", m: "Tay sau",
+    s: ["Đứng sát máy cáp, nắm thanh hoặc dây, khuỷu kẹp sát thân.",
+        "Đẩy xuống đến khi tay thẳng, siết tay sau.",
+        "Trả lên chậm đến khi cẳng tay vuông góc với bắp tay."],
+    t: ["Khuỷu giữ cố định, không đưa ra phía trước.", "Không dùng thân người đè xuống để lấy lực.", "Hạ chậm khoảng 2 giây khi quay lại."] },
+  ote: { n: "Overhead tricep extension", m: "Tay sau (đầu dài)",
+    s: ["Đứng hoặc ngồi, cầm một tạ đơn bằng hai tay, giơ qua đầu.",
+        "Gập khuỷu, hạ tạ ra sau đầu, khuỷu chỉ về phía trước.",
+        "Duỗi tay đẩy tạ lên, siết tay sau ở đỉnh."],
+    t: ["Giữ khuỷu gần tai, không để bè sang hai bên.", "Siết bụng, không ưỡn lưng.", "Đau khuỷu thì đổi sang dây cáp."] },
+
+  dl: { n: "Deadlift", m: "Lưng dưới · Mông · Đùi sau · Lưng trên",
+    s: ["Đứng chân rộng bằng hông, thanh đòn sát ống chân. Gập hông xuống nắm thanh, tay ngoài đầu gối.",
+        "Ngực ưỡn, lưng thẳng, siết nách để căng người trước khi nhấc.",
+        "Đạp chân xuống sàn, đẩy hông ra trước, thanh trượt sát chân cho đến khi đứng thẳng.",
+        "Hạ tạ ngược lại: đẩy hông ra sau trước, rồi mới gập gối."],
+    t: ["Lưng giữ trung tính, tuyệt đối không cong.", "Thanh đòn luôn sát người.", "Khởi động kỹ và tăng tạ dần. Nếu mới tập, học form với tạ nhẹ trước."] },
+  pu: { n: "Pull-up (hoặc assisted)", m: "Lưng xô · Tay trước",
+    s: ["Nắm xà rộng hơn vai, lòng bàn tay hướng ra trước, treo người với tay thẳng.",
+        "Hạ bả vai xuống, kéo ngực lên về phía xà, khuỷu hướng xuống sàn.",
+        "Cằm vượt qua xà, rồi hạ chậm về vị trí treo."],
+    t: ["Không đá chân lấy đà.", "Chưa kéo được thì dùng máy assisted hoặc dây kháng lực.", "Bắt đầu bằng việc hạ bả vai, rồi mới gập tay."] },
+  lpd: { n: "Lat pulldown", m: "Lưng xô · Tay trước",
+    s: ["Ngồi, khóa đùi dưới đệm, nắm thanh rộng hơn vai.",
+        "Ngả người nhẹ ra sau, ưỡn ngực, kéo thanh xuống đến xương đòn.",
+        "Siết lưng 1 giây, thả lên chậm đến khi tay thẳng."],
+    t: ["Không kéo thanh ra sau gáy.", "Nghĩ đến việc kéo khuỷu xuống hai bên hông.", "Không đu người lấy đà."] },
+  scr: { n: "Seated cable row", m: "Lưng giữa · Lưng xô · Tay trước",
+    s: ["Ngồi, chân đạp bục, gối hơi gập, lưng thẳng, tay duỗi cầm tay nắm.",
+        "Kéo tay nắm về phía bụng, khuỷu sát thân, ép hai bả vai lại.",
+        "Giữ 1 giây rồi trả tay ra chậm, để lưng giãn."],
+    t: ["Không ngả người ra sau quá nhiều.", "Vai không nhún lên tai.", "Giữ ngực mở suốt chuyển động."] },
+  sar: { n: "Single-arm dumbbell row", m: "Lưng xô · Lưng giữa",
+    s: ["Một tay và một gối chống lên ghế, lưng song song sàn, tay còn lại cầm tạ buông thẳng.",
+        "Kéo tạ về phía hông, khuỷu đi sát thân.",
+        "Siết lưng ở trên, hạ tạ chậm đến khi tay thẳng. Làm đủ rep rồi đổi bên."],
+    t: ["Không xoay thân để kéo tạ.", "Cổ trung tính, mắt nhìn xuống sàn.", "Kéo bằng khuỷu, không kéo bằng bàn tay."] },
+  fp: { n: "Face pull", m: "Vai sau · Lưng trên · Cơ xoay vai",
+    s: ["Chỉnh dây cáp ngang mặt, cầm hai đầu dây, lùi 1-2 bước.",
+        "Kéo dây về phía mặt, khuỷu cao ngang vai, tách hai đầu dây ra hai bên tai.",
+        "Siết bả vai 1 giây rồi trả lại chậm."],
+    t: ["Dùng tạ nhẹ, đây là bài bảo vệ vai.", "Không ngả người ra sau.", "Khuỷu luôn cao hơn cổ tay."] },
+  bc: { n: "Barbell curl", m: "Tay trước",
+    s: ["Đứng thẳng, cầm thanh tay ngửa rộng bằng vai, khuỷu sát hông.",
+        "Cuộn thanh lên đến ngang vai, siết bắp tay.",
+        "Hạ chậm trong 2-3 giây đến khi tay thẳng."],
+    t: ["Không đu người, không đẩy khuỷu ra trước.", "Dùng tạ vừa để kiểm soát cả chiều lên và xuống.", "Cổ tay giữ thẳng."] },
+  hc: { n: "Hammer curl", m: "Tay trước · Cẳng tay",
+    s: ["Đứng, hai tạ ở hai bên, lòng bàn tay hướng vào người (như cầm búa).",
+        "Cuộn tạ lên vai, khuỷu cố định sát thân.",
+        "Hạ chậm xuống."],
+    t: ["Giữ cổ tay thẳng, không xoay.", "Có thể tập luân phiên từng tay.", "Không nhún vai."] },
+
+  sq: { n: "Squat", m: "Đùi trước · Mông · Core",
+    s: ["Đặt thanh trên cơ thang sau vai, chân rộng bằng vai hoặc hơn một chút, mũi chân hướng ra ngoài 15-30°.",
+        "Hít sâu, siết bụng, đẩy hông ra sau và hạ người xuống như ngồi ghế.",
+        "Xuống đến khi đùi song song sàn hoặc sâu hơn nếu vẫn giữ được lưng thẳng.",
+        "Đạp cả bàn chân xuống sàn để đứng lên, thở ra khi lên."],
+    t: ["Gối cùng chiều mũi chân, không để cụp vào trong.", "Gót chân không rời sàn.", "Dùng rack và safety khi tập nặng."] },
+  rdl: { n: "Romanian deadlift", m: "Đùi sau · Mông · Lưng dưới",
+    s: ["Đứng thẳng, cầm thanh trước đùi, gối hơi gập.",
+        "Đẩy hông ra sau, thanh trượt sát đùi xuống dưới đầu gối.",
+        "Dừng khi đùi sau căng rõ, siết mông đẩy hông ra trước để đứng lên."],
+    t: ["Lưng thẳng, không cong.", "Góc gối gần như cố định, đây không phải squat.", "Thanh luôn sát chân."] },
+  lp: { n: "Leg press", m: "Đùi trước · Mông",
+    s: ["Ngồi sát lưng và mông vào ghế, hai chân đặt rộng bằng vai trên bục.",
+        "Mở khóa, hạ bục chậm đến khi gối gập khoảng 90°.",
+        "Đạp bục lên, không khóa cứng gối."],
+    t: ["Mông không được nhấc khỏi ghế.", "Gối cùng chiều mũi chân.", "Không đặt tay lên gối để đẩy."] },
+  wl: { n: "Walking lunge", m: "Đùi trước · Mông",
+    s: ["Đứng thẳng, có thể cầm tạ đơn ở hai bên.",
+        "Bước một chân dài về trước, hạ hông đến khi đùi trước song song sàn.",
+        "Đạp chân trước để đứng lên, bước chân sau lên phía trước và tiếp tục luân phiên."],
+    t: ["Thân người thẳng, siết bụng.", "Bước đủ dài để cẳng chân trước gần thẳng đứng.", "Giữ thăng bằng, nhìn về phía trước."] },
+  le: { n: "Leg extension", m: "Đùi trước",
+    s: ["Ngồi sát lưng, đệm ở cổ chân, gối thẳng hàng trục máy.",
+        "Duỗi chân lên đến thẳng, siết đùi trước 1 giây.",
+        "Hạ chậm trong 2-3 giây."],
+    t: ["Không giật tạ.", "Dùng mức tạ vừa phải để bảo vệ khớp gối.", "Hạ chậm, không thả rơi."] },
+  lc: { n: "Leg curl", m: "Đùi sau",
+    s: ["Nằm sấp hoặc ngồi, đệm ở trên gót chân, gối thẳng hàng trục máy.",
+        "Cuộn gót về phía mông, siết đùi sau.",
+        "Trả về chậm."],
+    t: ["Không nâng hông khỏi ghế.", "Kiểm soát chiều xuống.", "Hai chân dùng lực đều nhau."] },
+  ht: { n: "Hip thrust", m: "Mông · Đùi sau",
+    s: ["Ngồi sàn, lưng trên dựa vào ghế, thanh tạ (có đệm) đặt trên hông, chân rộng bằng hông.",
+        "Đẩy hông lên đến khi thân từ vai tới gối thành một đường thẳng.",
+        "Siết mông 1 giây rồi hạ chậm."],
+    t: ["Cằm hơi cúi, mắt nhìn về phía trước.", "Ở đỉnh, cẳng chân gần vuông góc với sàn.", "Không ưỡn lưng dưới quá mức."] },
+  cr: { n: "Calf raise", m: "Bắp chân",
+    s: ["Đứng trên bục bằng mũi chân, gót thả tự do (trên máy hoặc bậc thang).",
+        "Nâng gót lên cao nhất có thể, giữ 1 giây.",
+        "Hạ chậm đến khi bắp chân căng."],
+    t: ["Biên độ đầy đủ quan trọng hơn tạ nặng.", "Gối thẳng nhưng không khóa cứng.", "Không nảy."] },
+
+  ohp: { n: "Overhead press", m: "Vai · Tay sau · Core",
+    s: ["Đứng, thanh ở ngang xương đòn, nắm rộng bằng vai, khuỷu hơi ở phía trước thanh.",
+        "Siết bụng và mông, đẩy thanh thẳng lên qua đầu (đầu hơi né ra sau rồi trở lại).",
+        "Khóa tay ở trên, hạ thanh về xương đòn có kiểm soát."],
+    t: ["Không ưỡn lưng, siết bụng và mông để giữ thân ổn định.", "Thanh đi theo đường thẳng đứng.", "Chọn tạ vừa phải, giữ thân không lắc."] },
+  idc: { n: "Incline dumbbell curl", m: "Tay trước (đầu dài)",
+    s: ["Ngồi ghế nghiêng 45-60°, hai tay buông thẳng xuống sau thân.",
+        "Cuộn tạ lên, khuỷu giữ cố định.",
+        "Hạ chậm đến khi tay thẳng, cảm nhận bắp tay căng."],
+    t: ["Dùng tạ nhẹ hơn curl thường.", "Không đưa khuỷu ra phía trước.", "Giữ vai tựa vào ghế."] },
+  dbf: { n: "Dumbbell fly", m: "Ngực",
+    s: ["Nằm ghế phẳng, hai tạ trên ngực, tay hơi gập, lòng bàn tay đối nhau.",
+        "Mở hai tay sang hai bên theo vòng cung đến khi ngực căng.",
+        "Khép tay lại như đang ôm, siết ngực."],
+    t: ["Dùng tạ nhẹ, tập trung vào độ giãn cơ.", "Giữ góc khuỷu cố định.", "Không hạ tạ thấp hơn vai."] },
+  sk: { n: "Skull crusher", m: "Tay sau",
+    s: ["Nằm ghế phẳng, cầm thanh EZ trên ngực, tay thẳng.",
+        "Gập khuỷu, hạ thanh xuống gần trán hoặc sau đầu.",
+        "Duỗi tay đẩy lên, giữ khuỷu cố định."],
+    t: ["Khuỷu chỉ lên trần, không bè ra hai bên.", "Dùng mức tạ vừa; đau khuỷu thì đổi sang dây cáp.", "Tập nặng nên có người đỡ."] },
+  pl: { n: "Plank", m: "Core · Vai · Mông",
+    s: ["Chống khuỷu tay ngay dưới vai, người thẳng từ đầu đến gót.",
+        "Siết bụng, mông và đùi.",
+        "Giữ nhịp thở đều trong 45-60 giây."],
+    t: ["Không để hông võng xuống hoặc nhô cao.", "Mắt nhìn xuống sàn.", "Dừng khi form xấu đi."] },
+  hlr: { n: "Hanging leg raise", m: "Bụng dưới · Cơ gập hông",
+    s: ["Treo người trên xà, hạ vai xuống, giữ thân ổn định.",
+        "Nâng hai chân thẳng (hoặc gập gối) lên ngang hông hoặc cao hơn, cuộn nhẹ xương chậu.",
+        "Hạ chậm, không đu người."],
+    t: ["Chưa đủ lực thì gập gối khi nâng.", "Không vung người lấy đà.", "Có thể thay bằng crunch nếu không có xà."] },
+  rt: { n: "Russian twist", m: "Cơ liên sườn · Bụng",
+    s: ["Ngồi sàn, gối gập, ngả thân khoảng 45° với lưng thẳng, có thể cầm một tạ nhỏ.",
+        "Xoay thân sang một bên rồi sang bên còn lại.",
+        "Khi đã quen, nhấc chân khỏi sàn để khó hơn."],
+    t: ["Xoay bằng thân, không chỉ vung tay.", "Lưng không cong.", "Giữ nhịp thở đều."] }
+};
+
+var DAYS = [
+  { id: 0, short: "T2", label: "Push", title: "Thứ 2: Push", sub: "Ngực, Vai, Tay sau", c: "#C8352B", ink: "#fff",
+    list: [["bench","4 x 8-10"],["incdb","3 x 10-12"],["cfly","3 x 12-15"],["shp","3 x 10"],["lat","3 x 12-15"],["rdf","3 x 15"],["tpd","3 x 12"],["ote","3 x 12"]] },
+  { id: 1, short: "T3", label: "Nghỉ", rest: true },
+  { id: 2, short: "T4", label: "Pull", title: "Thứ 4: Pull", sub: "Lưng, Tay trước", c: "#1E5BB8", ink: "#fff",
+    list: [["dl","3 x 6-8"],["pu","3 x tối đa"],["lpd","3 x 10-12"],["scr","3 x 10-12"],["sar","3 x 10 mỗi bên"],["fp","3 x 15"],["bc","3 x 10-12"],["hc","3 x 12"]] },
+  { id: 3, short: "T5", label: "Nghỉ", rest: true },
+  { id: 4, short: "T6", label: "Legs", title: "Thứ 6: Legs", sub: "Chân, Mông", c: "#E2B100", ink: "#17222B",
+    list: [["sq","4 x 8-10"],["rdl","3 x 10"],["lp","3 x 12"],["wl","3 x 12 mỗi chân"],["le","3 x 12-15"],["lc","3 x 12"],["ht","3 x 10-12"],["cr","4 x 15"]] },
+  { id: 5, short: "T7", label: "Upper", title: "Thứ 7: Upper + Core", sub: "Vai, Tay, Ngực, Bụng", c: "#2E8B4F", ink: "#fff",
+    list: [["ohp","3 x 8-10"],["idc","3 x 12"],["dbf","3 x 12"],["scr","3 x 12"],["sk","3 x 12"],["pl","3 x 45-60 giây"],["hlr","3 x 12-15"],["rt","3 x 20"]] },
+  { id: 6, short: "CN", label: "Recovery", title: "Chủ nhật: Recovery", sub: "Phục hồi", c: "#55646F", ink: "#fff", recovery: true }
+];
+
+var VIDEOS = {
+  bench: "xUwpMhs85V8", incdb: "GyC765Vks5g", cfly: "iEjqAJLUMfc", shp: "0I10wx3fg3c",
+  lat: "F7DlykphJc4", rdf: "XFSCz86Br7M", tpd: "7TSnAPgwn-8", ote: "KPvCT13h5x0",
+  pu: "L6ndoM3jNKM", lpd: "ZXb5HGjK1f8", scr: "LCHju8ZAqJU", sar: "0nXhkDj8P48",
+  fp: "94vy2V23vCk", bc: "qGk87JguYlo", hc: "w2GbcWoQr-Q",
+  sq: "qJcesrdD0X4", rdl: "nE4-LcQ9px4", lp: "1HzPDRu3U4c", wl: "J0W3-L_Ke3s",
+  le: "5Z1slEHoz0w", lc: "nHrBfH3R-nE", ht: "9NOrj13Xi_k", cr: "IddSR-71Dd4",
+  ohp: "LYuBJZWs3dM", idc: "MGacw8jJie0", pl: "ZUZ0mXQFgvE", hlr: "Hi5q4M7EEyo", rt: "AxW2hfJ0XlA"
+  /* Chưa có ID: dl (Deadlift), dbf (Dumbbell fly), sk (Skull crusher). Điền vào đây khi có, ví dụ: dl: "abc123XYZ_0" */
+};
+
+var state = { day: 0, ex: null };
+function load(k) { try { return JSON.parse(localStorage.getItem(k) || "{}") || {}; } catch (e) { return {}; } }
+function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+var prog = load("gymprog2");
+
+var homeEl = document.getElementById("home");
+var pageEl = document.getElementById("page");
+var weekEl = document.getElementById("week");
+var listEl = document.getElementById("list");
+var dtitle = document.getElementById("dtitle");
+var dsub = document.getElementById("dsub");
+var progressEl = document.getElementById("progress");
+
+function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+function key(d, i) { return d + ":" + i; }
+function total(it) { var m = /^(\d+)/.exec(it[1]); return m ? +m[1] : 3; }
+function reps(it) { return it[1].replace(/^\d+\s*x\s*/, ""); }
+function setTheme(d) {
+  document.documentElement.style.setProperty("--day", d.c);
+  document.documentElement.style.setProperty("--day-ink", d.ink);
+}
+
+function renderWeek() {
+  weekEl.innerHTML = "";
+  DAYS.forEach(function (d) {
+    var b = document.createElement("button");
+    b.className = "dbtn" + (d.rest ? " rest" : "");
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(state.day === d.id));
+    b.style.setProperty("--c", d.c || "var(--line)");
+    if (d.rest) { b.disabled = true; b.setAttribute("aria-label", d.short + " nghỉ"); }
+    b.innerHTML = '<span class="plate"></span><span class="dn">' + d.short + '</span><span class="dl">' + d.label + "</span>";
+    if (!d.rest) b.addEventListener("click", function () { state.day = d.id; renderHome(); });
+    weekEl.appendChild(b);
+  });
+}
+
+function renderHome() {
+  var d = DAYS[state.day];
+  setTheme(d);
+  renderWeek();
+  dtitle.textContent = d.title;
+  dsub.textContent = d.sub;
+  listEl.innerHTML = "";
+  if (d.recovery) {
+    progressEl.textContent = "";
+    listEl.innerHTML = '<li class="static"><div style="font-weight:600;font-size:17px">Cardio nhẹ: 25-30 phút</div><div style="color:var(--muted)">Đi bộ nhanh hoặc đạp xe ở cường độ vừa, vẫn nói chuyện được.</div></li>' +
+      '<li class="static"><div style="font-weight:600;font-size:17px">Giãn cơ và foam rolling: 10-15 phút</div><div style="color:var(--muted)">Tập trung các nhóm cơ đã tập trong tuần: ngực, lưng, đùi, mông, vai.</div></li>';
+    return;
+  }
+  var finished = 0;
+  d.list.forEach(function (it, i) {
+    var e = EX[it[0]], n = prog[key(d.id, i)] || 0, t = total(it), ok = n >= t;
+    if (ok) finished++;
+    var li = document.createElement("li");
+    var b = document.createElement("button");
+    b.className = "ex" + (ok ? " done" : "");
+    b.innerHTML = '<span class="no">' + (i + 1) + '</span><span class="nm">' + esc(e.n) + '<span class="mu">' + esc(e.m) + '</span></span>' +
+      '<span class="rt"><span class="sr">' + esc(it[1]) + '</span><span class="st">' + (ok ? "Hoàn thành" : n + "/" + t + " set") + "</span></span>";
+    b.addEventListener("click", function () { state.ex = i; showPage(); });
+    li.appendChild(b);
+    listEl.appendChild(li);
+  });
+  progressEl.textContent = "Đã hoàn thành " + finished + "/" + d.list.length + " bài";
+}
+
+var YT = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
+
+function showHome() {
+  pageEl.hidden = true; homeEl.hidden = false;
+  renderHome(); window.scrollTo(0, 0);
+}
+function showPage() {
+  homeEl.hidden = true; pageEl.hidden = false;
+  renderPage(); window.scrollTo(0, 0);
+}
+
+function videoHtml(id, e) {
+  var v = VIDEOS[id];
+  if (v) {
+    return '<div class="player"><iframe src="https://www.youtube-nocookie.com/embed/' + v + '?rel=0&playsinline=1" title="Video hướng dẫn ' + esc(e.n) + '" loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>' +
+      '<p class="vhint"><a href="https://www.youtube.com/watch?v=' + v + '" target="_blank" rel="noopener noreferrer">Không xem được? Mở video trên YouTube</a></p>';
+  }
+  var url = "https://www.youtube.com/results?search_query=" + encodeURIComponent(e.n + " hướng dẫn kỹ thuật tiếng Việt");
+  return '<a class="vbtn" href="' + url + '" target="_blank" rel="noopener noreferrer">' + YT + 'Tìm video hướng dẫn tiếng Việt</a>' +
+    '<p class="vhint">Bài này chưa có video gắn sẵn. Thêm ID video vào đối tượng VIDEOS trong code để hiện trình phát ở đây.</p>';
+}
+
+function renderPage() {
+  var d = DAYS[state.day], i = state.ex, it = d.list[i], id = it[0], e = EX[id];
+  var k = key(d.id, i), n = prog[k] || 0, t = total(it), ok = n >= t;
+  setTheme(d);
+  var dots = "";
+  for (var s = 1; s <= t; s++) dots += '<span class="dot' + (s <= n ? " on" : "") + '">' + s + "</span>";
+  var hasNext = i < d.list.length - 1;
+
+  pageEl.innerHTML =
+    '<div><button class="back" id="back" type="button">&larr; ' + esc(d.title) + '</button><span class="pos">Bài ' + (i + 1) + "/" + d.list.length + "</span></div>" +
+    "<h1>" + esc(e.n) + "</h1>" +
+    '<p class="meta">' + esc(e.m) + "</p>" +
+    '<div class="chips"><span class="chip">' + t + " set</span><span class=\"chip\">" + esc(reps(it)) + (/giây|tối đa/.test(it[1]) ? "" : " rep") + "</span></div>" +
+
+    '<div class="card count" aria-live="polite">' +
+      '<div class="big">' + n + "<small> / " + t + "</small></div>" +
+      '<div class="lbl">set đã hoàn thành</div>' +
+      '<div class="dots">' + dots + "</div>" +
+      (ok
+        ? '<div class="card finish" style="margin:0"><strong>Hoàn thành bài này</strong>' + (hasNext ? '<button class="bigbtn" id="next2" type="button">Bài tiếp theo &rarr;</button>' : '<button class="bigbtn" id="home2" type="button">Về danh sách</button>') + "</div>"
+        : '<button class="bigbtn" id="inc" type="button">Xong set ' + (n + 1) + "</button>") +
+      '<div class="row2"><button class="ghost" id="undo" type="button"' + (n === 0 ? " disabled" : "") + '>Hoàn tác</button><button class="ghost" id="reset" type="button"' + (n === 0 ? " disabled" : "") + ">Làm lại từ đầu</button></div>" +
+    "</div>" +
+
+    '<div class="card"><h2>Video hướng dẫn (tiếng Việt)</h2>' + videoHtml(id, e) + "</div>" +
+
+    '<div class="card"><h2>Cách thực hiện</h2><ol class="steps">' + e.s.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ol></div>" +
+    '<div class="card"><h2>Lưu ý</h2><ul class="tips">' + e.t.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>" +
+    '<div class="pn"><button id="prev" type="button"' + (i === 0 ? " disabled" : "") + '>&larr; Bài trước</button><button id="next" type="button"' + (hasNext ? "" : " disabled") + '>Bài sau &rarr;</button></div>';
+
+  function $(x) { return document.getElementById(x); }
+  function on(x, f) { var el = $(x); if (el) el.addEventListener("click", f); }
+  on("back", showHome);
+  on("home2", showHome);
+  on("inc", function () { prog[k] = Math.min(t, n + 1); save("gymprog2", prog); renderPage(); });
+  on("undo", function () { prog[k] = Math.max(0, n - 1); save("gymprog2", prog); renderPage(); });
+  on("reset", function () { delete prog[k]; save("gymprog2", prog); renderPage(); });
+  function go(delta) { state.ex = i + delta; showPage(); }
+  on("next", function () { go(1); });
+  on("next2", function () { go(1); });
+  on("prev", function () { go(-1); });
+}
+
+renderHome();
+</script>
+</body>
+</html>
