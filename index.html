@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0d1117">
 <meta name="description" content="Plan tập tăng cơ 4 buổi/tuần (Upper/Lower) với streak tracking, rest timer và hướng dẫn chi tiết">
-<title>GymTrack — Push · Pull · Legs · Upper</title>
+<title>GymTrack — Push · Pull · Legs · Ngực/Lưng · Vai/Tay</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -515,16 +515,17 @@ var EX = {
    ═══════════════════════════════════════════════ */
 var DAYS = [
   { id:0, short:"T2", label:"Push", title:"Thứ 2 — Push", sub:"Ngực · Vai · Tay sau", c:"#ff6b6b", glow:"rgba(255,107,107,.10)",
-    list:[["mcp","4 x 6-8"],["mip","3 x 8-10"],["cfly","3 x 12-15"],["smsp","3 x 8-10"],["lat","4 x 10-12"],["tpd","3 x 10-12"],["cote","3 x 10-12"]] },
+    list:[["mcp","4 x 6-8"],["mip","3 x 8-10"],["cfly","3 x 12-15"],["smsp","3 x 8-10"],["lat","4 x 10-12"],["tpd","3 x 10-12"]] },
   { id:1, short:"T3", label:"Nghỉ", rest:true, c:"#484f58" },
   { id:2, short:"T4", label:"Pull", title:"Thứ 4 — Pull", sub:"Lưng · Vai sau · Tay trước", c:"#58a6ff", glow:"rgba(88,166,255,.10)",
     list:[["lpd","4 x 8-10"],["cdr","3 x 8-10"],["scr","3 x 10-12"],["rdf","3 x 12-15"],["lat","3 x 12-15"],["hc","3 x 8-10"],["idc","3 x 10-12"]] },
   { id:3, short:"T5", label:"Nghỉ", rest:true, c:"#484f58" },
   { id:4, short:"T6", label:"Legs", title:"Thứ 6 — Legs (buổi chân duy nhất)", sub:"Đùi trước · Đùi sau · Mông · Bắp chân", c:"#3fb950", glow:"rgba(63,185,80,.10)",
     list:[["lp","5 x 8-10"],["le","4 x 10-12"],["srdl","3 x 8-10"],["lc","4 x 10-12"],["smht","3 x 8-12"],["cr","5 x 10-15"]] },
-  { id:5, short:"T7", label:"Upper", title:"Thứ 7 — Upper (volume)", sub:"Ngực · Lưng · Vai · Tay · Bụng — nhiều rep", c:"#d29922", glow:"rgba(210,153,34,.10)",
-    list:[["mip","3 x 10-12"],["scr","4 x 10-12"],["lat","4 x 12-15"],["rdf","3 x 12-15"],["tpd","3 x 12-15"],["ccurl","3 x 10-12"],["ccrunch","3 x 12-15"]] },
-  { id:6, short:"CN", label:"Recovery", title:"Chủ nhật — Recovery", sub:"Phục hồi nhẹ (không cardio nặng)", c:"#7d8590", glow:"rgba(125,133,144,.08)", recovery:true }
+  { id:5, short:"T7", label:"Ngực & Lưng", title:"Thứ 7 — Ngực & Lưng (volume)", sub:"Ngực · Lưng · Bụng — nhiều rep", c:"#d29922", glow:"rgba(210,153,34,.10)",
+    list:[["mip","3 x 10-12"],["lpd","3 x 10-12"],["scr","4 x 10-12"],["cdr","3 x 10-12"],["ccrunch","3 x 12-15"]] },
+  { id:6, short:"CN", label:"Vai & Tay", title:"Chủ nhật — Vai & Tay", sub:"Vai · Tay trước · Tay sau · Core — làm nhẹ nhàng, chừa 2 rep", c:"#bc8cff", glow:"rgba(188,140,255,.10)",
+    list:[["lat","4 x 12-15"],["rdf","3 x 12-15"],["cote","3 x 10-12"],["tpd","3 x 12-15"],["ccurl","3 x 10-12"],["pl","3 x 45-60 giây"]] }
 ];
 
 var VIDEOS = {
@@ -579,7 +580,7 @@ function esc(s) { return String(s).replace(/[&<>"]/g, function(c) { return {"&":
    ═══════════════════════════════════════════════ */
 function dateKey(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
 function parseKey(k) { var p = k.split('-'); return new Date(+p[0], +p[1]-1, +p[2]); }
-// Ngày nghỉ (T3, T5) không bắt buộc điểm danh, không làm mất chuỗi. CN vẫn tính.
+// Ngày nghỉ (T3, T5) không bắt buộc điểm danh, không làm mất chuỗi.
 function isSkipDate(d) { var day = DAYS[(d.getDay() + 6) % 7]; return !!day.rest; }
 
 function calcStreak() {
