@@ -1024,6 +1024,11 @@ function renderStats() {
 
   // Reset data
   html += '<div style="text-align:center;margin-top:20px" class="fade-in fade-in-d4">';
+  html += '<div style="margin-bottom:14px;font-size:12px;color:var(--faint);line-height:1.5">Dữ liệu (chuỗi, mức tạ, tiến độ) lưu trong trình duyệt. Đổi link/đổi chỗ mở file sẽ như máy mới → hãy sao lưu trước khi sửa app, rồi khôi phục lại.</div>';
+  html += '<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:14px">';
+  html += '<button class="ghost-btn" id="backupBtn" style="padding:10px 18px">💾 Sao lưu</button>';
+  html += '<button class="ghost-btn" id="restoreBtn" style="padding:10px 18px">📥 Khôi phục</button>';
+  html += '<input type="file" id="restoreFile" accept=".json,application/json" style="display:none"></div>';
   html += '<button class="ghost-btn" id="resetAllBtn" style="color:var(--accent);border-color:rgba(255,107,107,.2);padding:10px 24px">🗑️ Reset toàn bộ dữ liệu</button>';
   html += '</div>';
 
@@ -1038,6 +1043,39 @@ function renderStats() {
   var calNext = document.getElementById("calNext");
   if (calPrev) calPrev.addEventListener("click", function() { calOffset--; updateCalendar(); });
   if (calNext) calNext.addEventListener("click", function() { calOffset++; updateCalendar(); });
+
+  // Backup / Restore
+  var bkBtn = document.getElementById("backupBtn"), rsBtn = document.getElementById("restoreBtn"), rsFile = document.getElementById("restoreFile");
+  if (bkBtn) bkBtn.addEventListener("click", function() {
+    var data = JSON.stringify({ app: "gym-tracker", v: 1, prog: prog, weights: weights, checkins: checkins, week: loadJSON("gt_prog_week", "") });
+    try {
+      var a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([data], { type: "application/json" }));
+      a.download = "gym-backup-" + todayStr() + ".json";
+      document.body.appendChild(a); a.click(); a.remove();
+    } catch (e) {}
+    if (navigator.clipboard) navigator.clipboard.writeText(data).catch(function() {});
+    showToast("💾 Đã sao lưu (file tải về + copy vào clipboard)");
+  });
+  if (rsBtn && rsFile) {
+    rsBtn.addEventListener("click", function() { rsFile.click(); });
+    rsFile.addEventListener("change", function() {
+      var f = rsFile.files[0]; if (!f) return;
+      var r = new FileReader();
+      r.onload = function() {
+        try {
+          var d = JSON.parse(r.result);
+          if (d.app !== "gym-tracker") throw 0;
+          prog = d.prog || {}; weights = d.weights || {};
+          Object.keys(d.checkins || {}).forEach(function(k) { checkins[k] = true; });
+          saveJSON("gt_prog", prog); saveJSON("gt_weights", weights); saveJSON("gt_checkins", checkins);
+          if (d.week) saveJSON("gt_prog_week", d.week);
+          render(); showToast("✅ Đã khôi phục dữ liệu");
+        } catch (e) { alert("File sao lưu không hợp lệ."); }
+      };
+      r.readAsText(f);
+    });
+  }
 
   // Reset
   var resetBtn = document.getElementById("resetAllBtn");
